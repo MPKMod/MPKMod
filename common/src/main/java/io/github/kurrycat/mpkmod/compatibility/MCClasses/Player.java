@@ -49,6 +49,7 @@ public class Player {
     public Float last45 = null;
     public int grinds = 0;
     public boolean grindTick = false;
+    public int jumpCooldown = 0;
     public boolean jumpTick = false;
     public boolean landTick = false;
     public String lastTiming = "None";
@@ -238,7 +239,18 @@ public class Player {
         if (prev.onGround && !onGround) airtime = 1;
 
         landTick = (!prev.onGround && onGround);
-        jumpTick = !onGround && prev.onGround && keyInput.jump;
+
+        jumpCooldown = prev.jumpCooldown;
+        if (keyInput.jump) {
+            if (jumpCooldown > 1) {
+                jumpCooldown--;
+            } else if (!onGround && prev.onGround) {
+                jumpTick = true;
+                jumpCooldown = 10;
+            }
+        } else {
+            jumpCooldown = 0;
+        }
 
         lastLanding = landTick ? new PosAndAngle(prev.pos, prev.trueYaw, prev.truePitch) : prev.lastLanding;
         lastHit = prev.landTick ? new PosAndAngle(prev.pos, prev.trueYaw, prev.truePitch) : prev.lastHit;
